@@ -1,5 +1,6 @@
 from tkinter import *
 import tkinter as tk
+from pip._vendor import requests
 
 class Interface:
     principal = tk.Tk()
@@ -23,12 +24,6 @@ class Frames:
                                 highlightbackground='#ffffff',
                                 highlightthickness=0)
 
-    frameAviso = Frame(Interface.principal,
-                           width=180,
-                           height=90,
-                           bg='#ffffff',
-                           highlightthickness=0)
-
     frameJurosCompostos.place(x=0, y=0)
     frameResultado.place(x=50, y=200)
 
@@ -36,6 +31,8 @@ class label:
 
     cifrao = PhotoImage(file='imagens\\faculRS.png')
     porcentagem = PhotoImage(file='imagens\\faculPorcent.png')
+    relogio = PhotoImage(file='imagens\\faculClock.png')
+    aviso = PhotoImage(file='imagens\\aviso.png')
 
     labelTitulo = Label(Frames.frameJurosCompostos,
                        text="Simulador de Juros compostos",
@@ -64,6 +61,8 @@ class label:
                        font=('Finance', 9),
                       foreground='#000000',
                       bg='#ededed')
+    labelRelogio = Label(Frames.frameJurosCompostos,
+                        image=relogio)
 
     labelResultado = Label(Frames.frameResultado,
                         text="",
@@ -77,18 +76,20 @@ class label:
                        foreground='#000000',
                        bg='#ededed')
 
-    labelErro = Label(Frames.frameAviso,
-                       text="",
-                       font=('Finance', 10),
-                       foreground='#000000',
-                       bg='#ffffff')
+    labelFundoAviso = Label(Interface.principal,
+                       bg='#ededed',
+                      image=aviso)
+    labelAviso = Label(labelFundoAviso,
+                            text="",
+                            font=('Finance', 10),
+                            foreground='#000000',
+                            bg='#ffffff')
 
     labelTitulo.place(x=20, y=20)
     labelValor.place(x=20, y=60)
     labelTaxa.place(x=200, y=60)
     labelTempo.place(x=380, y=60)
     labelTotal.place(x=50, y=170)
-    labelErro.place(x=10, y=20)
 
 class entry:
 
@@ -98,17 +99,19 @@ class entry:
 
     entryTempo = Entry(Frames.frameJurosCompostos)
 
-    label.labelCifrao.place(x=20, y=83)
+    label.labelCifrao.place(x=20, y=85)
     entryValor.place(x=46, y=90)
-    label.labelPorcentagem.place(x=200, y=83)
+    label.labelPorcentagem.place(x=198, y=86)
     entryTaxa.place(x=222, y=90)
-    entryTempo.place(x=380, y=90)
+    label.labelRelogio.place(x=376, y=86)
+    entryTempo.place(x=400, y=90)
 
 class Button:
 
     calcular=PhotoImage(file='imagens\\faculCalcular.png')
     limpar = PhotoImage(file='imagens\\faculLimpar.png')
     fechar = PhotoImage(file='imagens\\botao-x.png')
+    cotacao = PhotoImage(file='imagens\\faculCotacao.png')
 
     buttonCalc = Button(Frames.frameJurosCompostos,
                         image=calcular,
@@ -122,16 +125,21 @@ class Button:
                         bg='#ededed',
                         bd=0)
 
-    buttonfechar = Button(Interface.principal,
+    buttonfechar = Button(label.labelFundoAviso,
                           image=fechar,
                           command=lambda: Funcoes.fechar(self=None),
+                          bg='#ffffff',
+                          bd=0)
+
+    buttonCotacao = Button(Interface.principal,
+                          image=cotacao,
+                          command=lambda: Funcoes.cotacao(self=None),
                           bg='#ededed',
                           bd=0)
 
     buttonCalc.place(x=350, y=140)
     buttonLimpar.place(x=440, y=140)
-
-    # ff9900
+    buttonCotacao.place(x=460, y=10)
 
 periodoEscolhido=IntVar()
 taxaEscolhida=IntVar()
@@ -173,39 +181,44 @@ class Funcoes:
 
         if entry.entryValor.get() == "":
 
-            Frames.frameAviso.place(x=180, y=50)
-            label.labelErro['text'] = "O campo\nValor inicial aplicado,\nnão foi preenchido."
-            Button.buttonfechar.place(x=180, y=50)
+            label.labelFundoAviso.place(x=180, y=45)
+            label.labelAviso['text'] = "O campo\nValor inicial aplicado,\nnão foi preenchido."
+            label.labelAviso.place(x=15, y=15)
+            Button.buttonfechar.place(x=2, y=2)
 
         elif entry.entryTaxa.get() == "":
 
-            Frames.frameAviso.place(x=180, y=50)
-            label.labelErro['text'] = "O campo\nValor taxa de juros,\nnão foi preenchido."
-            Button.buttonfechar.place(x=180, y=50)
+            label.labelFundoAviso.place(x=180, y=45)
+            label.labelAviso['text'] = "O campo\nValor taxa de juros,\nnão foi preenchido."
+            label.labelAviso.place(x=20, y=15)
+            Button.buttonfechar.place(x=2, y=2)
 
         elif entry.entryTempo.get() == "":
 
-            Frames.frameAviso.place(x=180, y=50)
-            label.labelErro['text'] = "O campo\nValor periodo em anos,\nnão foi preenchido."
-            Button.buttonfechar.place(x=180, y=50)
+            label.labelFundoAviso.place(x=180, y=45)
+            label.labelAviso['text'] = "O campo\nValor periodo em anos,\nnão foi preenchido."
+            label.labelAviso.place(x=13, y=15)
+            Button.buttonfechar.place(x=2, y=2)
 
         elif taxaEscolhida.get() == 0:
 
-            Frames.frameAviso.place(x=180, y=50)
-            label.labelErro['text'] = "O periodo da taxa\n precisa ser selecionado"
-            Button.buttonfechar.place(x=180, y=50)
+            label.labelFundoAviso.place(x=180, y=45)
+            label.labelAviso['text'] = "O periodo da taxa\n precisa ser selecionado"
+            label.labelAviso.place(x=8, y=23)
+            Button.buttonfechar.place(x=2, y=2)
 
         elif periodoEscolhido.get() == 0:
 
-            Frames.frameAviso.place(x=180, y=50)
-            label.labelErro['text'] = "O periodo precisa ser\nselecionado como\nmensal ou anual"
-            Button.buttonfechar.place(x=180, y=50)
+            label.labelFundoAviso.place(x=180, y=45)
+            label.labelAviso['text'] = "O periodo precisa ser\nselecionado como\nmensal ou anual"
+            label.labelAviso.place(x=16, y=19)
+            Button.buttonfechar.place(x=2, y=2)
 
         else:
 
-            valor = int(entry.entryValor.get())
-            taxa = int(entry.entryTaxa.get())
-            tempo = int(entry.entryTempo.get())
+            valor = float(entry.entryValor.get())
+            taxa = float(entry.entryTaxa.get())
+            tempo = float(entry.entryTempo.get())
 
             if taxaEscolhida.get() == 3:
 
@@ -245,7 +258,23 @@ class Funcoes:
 
     def fechar(self):
 
-        Frames.frameAviso.place_forget()
+        label.labelFundoAviso.place_forget()
         Button.buttonfechar.place_forget()
+
+    def cotacao(self):
+
+        req = requests.get("https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,BTC-BRL")
+
+        req_dic = req.json()
+
+        cotacao_usd = req_dic['USDBRL']['bid']
+        cotacao_eur = req_dic['EURBRL']['bid']
+        cotacao_btc = req_dic['BTCBRL']['bid']
+
+        label.labelFundoAviso.place(x=180, y=45)
+        label.labelAviso['text'] = 'Dolar: R$',cotacao_usd,'\n Euro: R$',cotacao_eur,'\n Bitcoin: R$',cotacao_btc
+        label.labelAviso.place(x=33, y=21)
+        Button.buttonfechar.place(x=2, y=2)
+
 
 Interface.principal.mainloop()
