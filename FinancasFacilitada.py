@@ -17,15 +17,7 @@ class Frames:
                               highlightbackground='#ffffff',
                               highlightthickness=0)
 
-    frameResultado = Frame(Interface.principal,
-                                width=450,
-                                height=60,
-                                bg='#ffffff',
-                                highlightbackground='#ffffff',
-                                highlightthickness=0)
-
     frameJurosCompostos.place(x=0, y=0)
-    frameResultado.place(x=50, y=200)
 
 class label:
 
@@ -33,6 +25,8 @@ class label:
     porcentagem = PhotoImage(file='imagens\\faculPorcent.png')
     relogio = PhotoImage(file='imagens\\faculClock.png')
     aviso = PhotoImage(file='imagens\\aviso.png')
+    aporteIcon = PhotoImage(file='imagens\\faculAporte.png')
+    frameResultado = PhotoImage(file='imagens\\frameResultado.png')
 
     labelTitulo = Label(Frames.frameJurosCompostos,
                        text="Simulador de Juros compostos",
@@ -64,7 +58,9 @@ class label:
     labelRelogio = Label(Frames.frameJurosCompostos,
                         image=relogio)
 
-    labelResultado = Label(Frames.frameResultado,
+    labelFrameResultado = Label(Frames.frameJurosCompostos,
+                        image=frameResultado)
+    labelResultado = Label(labelFrameResultado,
                         text="",
                         font=('Finance', 16),
                         foreground='#000000',
@@ -85,19 +81,36 @@ class label:
                             foreground='#000000',
                             bg='#ffffff')
 
+    labelAporte = Label(Frames.frameJurosCompostos,
+                        text="Aportes mensais",
+                        font=('Finance', 9),
+                        foreground='#000000',
+                        bg='#ededed')
+    labelAporteIcon = Label(Interface.principal,
+                            bg='#ededed',
+                            image=aporteIcon)
+
     labelTitulo.place(x=20, y=20)
     labelValor.place(x=20, y=60)
     labelTaxa.place(x=200, y=60)
     labelTempo.place(x=380, y=60)
     labelTotal.place(x=50, y=170)
+    labelAporte.place(x=20, y=115)
+    labelFrameResultado.place(x=23, y=190)
 
 class entry:
 
-    entryValor = Entry(Frames.frameJurosCompostos)
+    entryValor = Entry(Frames.frameJurosCompostos,
+                        relief=FLAT)
 
-    entryTaxa = Entry(Frames.frameJurosCompostos)
+    entryTaxa = Entry(Frames.frameJurosCompostos,
+                        relief=FLAT)
 
-    entryTempo = Entry(Frames.frameJurosCompostos)
+    entryTempo = Entry(Frames.frameJurosCompostos,
+                        relief=FLAT)
+
+    entryAporte = Entry(Frames.frameJurosCompostos,
+                        relief=FLAT)
 
     label.labelCifrao.place(x=20, y=85)
     entryValor.place(x=46, y=90)
@@ -105,6 +118,8 @@ class entry:
     entryTaxa.place(x=222, y=90)
     label.labelRelogio.place(x=376, y=86)
     entryTempo.place(x=400, y=90)
+    label.labelAporteIcon.place(x=18, y=135)
+    entryAporte.place(x=46, y=140)
 
 class Button:
 
@@ -184,35 +199,35 @@ class Funcoes:
             label.labelFundoAviso.place(x=180, y=45)
             label.labelAviso['text'] = "O campo\nValor inicial aplicado,\nnão foi preenchido."
             label.labelAviso.place(x=15, y=15)
-            Button.buttonfechar.place(x=2, y=2)
+            Button.buttonfechar.place(x=3.5, y=3.5)
 
         elif entry.entryTaxa.get() == "":
 
             label.labelFundoAviso.place(x=180, y=45)
             label.labelAviso['text'] = "O campo\nValor taxa de juros,\nnão foi preenchido."
             label.labelAviso.place(x=20, y=15)
-            Button.buttonfechar.place(x=2, y=2)
+            Button.buttonfechar.place(x=3.5, y=3.5)
 
         elif entry.entryTempo.get() == "":
 
             label.labelFundoAviso.place(x=180, y=45)
             label.labelAviso['text'] = "O campo\nValor periodo em anos,\nnão foi preenchido."
             label.labelAviso.place(x=13, y=15)
-            Button.buttonfechar.place(x=2, y=2)
+            Button.buttonfechar.place(x=3.5, y=3.5)
 
         elif taxaEscolhida.get() == 0:
 
             label.labelFundoAviso.place(x=180, y=45)
             label.labelAviso['text'] = "O periodo da taxa\n precisa ser selecionado"
             label.labelAviso.place(x=8, y=23)
-            Button.buttonfechar.place(x=2, y=2)
+            Button.buttonfechar.place(x=3.5, y=3.5)
 
         elif periodoEscolhido.get() == 0:
 
             label.labelFundoAviso.place(x=180, y=45)
             label.labelAviso['text'] = "O periodo precisa ser\nselecionado como\nmensal ou anual"
             label.labelAviso.place(x=16, y=19)
-            Button.buttonfechar.place(x=2, y=2)
+            Button.buttonfechar.place(x=3.5, y=3.5)
 
         else:
 
@@ -220,35 +235,77 @@ class Funcoes:
             taxa = float(entry.entryTaxa.get())
             tempo = float(entry.entryTempo.get())
 
-            if taxaEscolhida.get() == 3:
+            if entry.entryAporte.get() != "":
 
-                if periodoEscolhido.get() == 1:
+                aporte = float(entry.entryAporte.get())
 
-                    resultado = valor*(((taxa/100)+1)**tempo)
+                if taxaEscolhida.get() == 3: #Taxa mensal
 
-                else:
+                    if periodoEscolhido.get() == 1: #Periodo mensal
 
-                    resultado = valor*(((taxa/100)+1)**(tempo*12))
+                        resultadoValorInicial = valor*(((taxa/100)+1)**tempo)
+                        resultadoValorAporte = aporte * ((((taxa / 100) + 1) ** tempo)-1) / (taxa / 100)
+                        resultado = resultadoValorInicial + resultadoValorAporte
+
+                    else: #Periodo anual
+
+                        resultadoValorInicial = valor*(((taxa/100)+1)**(tempo*12))
+                        resultadoValorAporte = aporte * ((((taxa / 100) + 1) ** (tempo*12))-1) / (taxa / 100)
+                        resultado = resultadoValorInicial + resultadoValorAporte
+
+                else: #Taxa anual
+
+                    if periodoEscolhido.get() == 2: #Periodo anual
+
+                        taxaMensal = ((taxa / 100) + 1) ** (1 / 12)
+                        resultadoValorInicial = valor*(((taxa/100)+1)**tempo)
+                        resultadoValorAporte = aporte * (((taxaMensal) ** (tempo*12))-1) / (taxaMensal-1)
+                        resultado = resultadoValorInicial + resultadoValorAporte
+
+                    else: #Periodo mensal
+
+                        taxaMensal = ((taxa/100)+1)**(1/12)
+                        resultadoValorInicial = valor*(taxaMensal)**tempo
+                        resultadoValorAporte = aporte*(((taxaMensal**tempo)-1)/(taxaMensal-1))
+                        resultado = resultadoValorInicial+resultadoValorAporte
+
+
+                label.labelResultado['text'] = "R$ %.2f" % resultado
+                label.labelResultado.place(x=100, y=16)
+
 
             else:
 
-                if periodoEscolhido.get() == 2:
+                if taxaEscolhida.get() == 3:
 
-                    resultado = valor*(((taxa/100)+1)**tempo)
+                    if periodoEscolhido.get() == 1:
+
+                        resultado = valor*(((taxa/100)+1)**tempo)
+
+                    else:
+
+                        resultado = valor*(((taxa/100)+1)**(tempo*12))
 
                 else:
 
-                    taxaFinal = ((taxa/100)+1)**(1/12)
-                    resultado = valor*(taxaFinal)**tempo
+                    if periodoEscolhido.get() == 2:
 
-            label.labelResultado['text'] = "R$ %.2f" % resultado
-            label.labelResultado.place(x=100, y=16)
+                        resultado = valor*(((taxa/100)+1)**tempo)
+
+                    else:
+
+                        taxaFinal = ((taxa/100)+1)**(1/12)
+                        resultado = valor*(taxaFinal)**tempo
+
+                label.labelResultado['text'] = "R$ %.2f" % resultado
+                label.labelResultado.place(x=100, y=16)
 
     def limpar(self):
 
         entry.entryTaxa.delete(0, END)
         entry.entryValor.delete(0, END)
         entry.entryTempo.delete(0, END)
+        entry.entryAporte.delete(0, END)
         entry.entryValor.focus_force()
         label.labelResultado['text'] = ""
         CheckButton.checkbuttonPeriodoM.deselect()
@@ -270,11 +327,12 @@ class Funcoes:
         cotacao_usd = req_dic['USDBRL']['bid']
         cotacao_eur = req_dic['EURBRL']['bid']
         cotacao_btc = req_dic['BTCBRL']['bid']
+        cotacao_btc_float = float(cotacao_btc)*1000
 
         label.labelFundoAviso.place(x=180, y=45)
-        label.labelAviso['text'] = 'Dolar: R$',cotacao_usd,'\n Euro: R$',cotacao_eur,'\n Bitcoin: R$',cotacao_btc
+        label.labelAviso['text'] = 'Dolar: R$',cotacao_usd,'\n Euro: R$',cotacao_eur,'\n Bitcoin: R$',cotacao_btc_float
         label.labelAviso.place(x=33, y=21)
-        Button.buttonfechar.place(x=2, y=2)
+        Button.buttonfechar.place(x=3.5, y=3.5)
 
 
 Interface.principal.mainloop()
